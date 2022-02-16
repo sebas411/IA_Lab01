@@ -1,16 +1,80 @@
 from lib import *
 
+wall = color(0, 0, 0)
+floor = color(255, 255, 255)
+start = color(255, 0, 0)
+finish = color(0, 255, 0)
+pathc = color(180, 0, 180)
 
-#pendiente
-class graphSearch(object):
+class Framework(object):
   def __init__(self, mat):
     self.map = mat
     self.size = len(mat)
+    self.startpos = (0, 0)
+    self.finishlist = []
+    for y in range(self.size):
+      for x in range(self.size):
+        if mat[y][x] == start:
+          self.startpos = (x, y)
+        elif mat[y][x] == finish:
+          self.finishlist.append((x, y))
+    self.currentpos = self.startpos
+
+  def printInfo(self):
+    print(self.map)
+    print(self.size)
+    print(self.startpos)
+    print(self.finishlist)
+
+  def writeImage(self):
+    writebmp('discrete.bmp', self.size, self.size, self.map)
+  
+  def writePath(self, path):
+    mat = self.map[:]
+    for item in path:
+      x = item[0]
+      y = item[1]
+      if mat[y][x] == floor: mat[y][x] = pathc
+    writebmp('path.bmp', self.size, self.size, mat)
+  
+  def actions(self, s):
+    a = {'l','r','u','d'}
+    x = s[0]
+    y = s[1]
+    if x == 0 or self.map[y][x-1] == wall:
+      a.remove('l')
+    if x == self.size - 1 or self.map[y][x+1] != floor:
+      a.remove('r')
+    if y == 0 or self.map[y-1][x] == wall:
+      a.remove('d')
+    if y == self.size - 1 or self.map[y+1][x] != floor:
+      a.remove('u')
+    return a
+  
+  def result(self, s, a):
+    x = s[0]
+    y = s[1]
+    if a == 'u':
+      sp = (x, y + 1)
+    elif a == 'd':
+      sp = (x, y - 1)
+    elif a == 'l':
+      sp = (x - 1, y)
+    else:
+      sp = (x + 1, y)
+    return sp
+
+  def goalTest(self, s):
+    return s in self.finishlist
+  
+  def stepCost(self, s, a, sp):
+    pass
+
+  def pathCost(self, ls):
+    return len(ls)  
 
 
-
-
-im = Image('img/Test.bmp')
+im = Image('img/Test2.bmp')
 
 n = 20
 
@@ -18,12 +82,6 @@ mat = []
 
 sqSize = im.width/n
 
-wall = color(0, 0, 0)
-floor = color(255, 255, 255)
-start = color(255, 0, 0)
-finish = color(0, 255, 0)
-path = color(180, 0, 180)
-pos=(0, 0)
 avCols = [wall, floor]
 startFound = False
 
@@ -64,4 +122,32 @@ for y in range(n):
     row.append(ncol)
   mat.append(row)
     
-writebmp('output.bmp', len(mat[0]), len(mat), mat)
+f1 = Framework(mat)
+f1.writeImage()
+def graph_search(problem):
+  frontier = [[problem.startpos]]
+  explored = []
+
+  while True:
+    if len(frontier):
+      path = frontier.pop(0)
+      #print(len(path))
+      s = path[-1]
+      explored.append(s)
+      if problem.goalTest(s):
+        return path
+      for a in problem.actions(s):
+        result = problem.result(s, a)
+        if result not in explored:
+          new_path = path[:]
+          new_path.append(result)
+          frontier.append(new_path)
+    else:
+      return False
+
+npath = graph_search(f1)
+
+f1.writePath(npath)
+
+#(2,12) 22
+#(16,19) 24
