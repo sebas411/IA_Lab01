@@ -27,7 +27,7 @@ class Framework(object):
     print(self.finishlist)
 
   def writeImage(self):
-    writebmp('discrete2.bmp', self.size, self.size, self.map)
+    writebmp('discrete.bmp', self.size, self.size, self.map)
   
   def writePath(self, path):
     mat = self.map[:]
@@ -35,7 +35,7 @@ class Framework(object):
       x = item[0]
       y = item[1]
       if mat[y][x] == floor: mat[y][x] = pathc
-    writebmp('path2.bmp', self.size, self.size, mat)
+    writebmp('path.bmp', self.size, self.size, mat)
   
   def actions(self, s):
     a = {'l','r','u','d'}
@@ -66,17 +66,11 @@ class Framework(object):
 
   def goalTest(self, s):
     return s in self.finishlist
-  
-  def stepCost(self, s, a, sp):
-    pass
-
-  def pathCost(self, ls):
-    return len(ls)  
 
 
-im = Image('img/Test.bmp')
+im = Image('img/Test2.bmp')
 
-n = 13
+n = 20
 
 mat = []
 
@@ -166,7 +160,46 @@ def depth_first(problem, node = None, visited=[]):
   else:
     return []
 
-npath = depth_first(f1)
+def heuristic1(problem, node):
+  d = float('inf')
+  for finish in problem.finishlist:
+    dy = abs(finish[1] - node[1])
+    dx = abs(finish[0] - node[0])
+    if dx + dy < d: d = dx + dy
+  return d
+
+def astar(problem, heu):
+  openList = [(problem.startpos,0,[])]
+  closedList = []
+  while openList:
+    current = openList[0]
+    for node in openList:
+      if node[1] < current[1]:
+        current = node
+    openList.remove(current)
+    s = current[0]
+    closedList.append(s)
+    if problem.goalTest(s):
+      return current[2]
+    for a in problem.actions(s):
+      result = problem.result(s, a)
+      if result in closedList: continue
+      g = current[2][:]
+      g.append(result)
+      h = heu(problem, s)
+      f = len(g) + h
+      cont = False
+      for op in openList:
+        if op[0] == result and len(g) > len(op[2]):
+          cont = True
+          break
+      if cont: continue
+      openList.append((result, f, g))
+  else:
+    return []
+
+
+npath = astar(f1, heuristic1)
 print(npath)
 f1.writePath(npath)
 #npath = graph_search(f1)
