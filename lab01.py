@@ -49,7 +49,7 @@ class Framework(object):
       a.remove('d')
     if y == self.size - 1 or self.map[y+1][x] != floor:
       a.remove('u')
-    return a
+    return a 
   
   def result(self, s, a):
     x = s[0]
