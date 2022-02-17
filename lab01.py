@@ -27,7 +27,7 @@ class Framework(object):
     print(self.finishlist)
 
   def writeImage(self):
-    writebmp('discrete.bmp', self.size, self.size, self.map)
+    writebmp('discrete2.bmp', self.size, self.size, self.map)
   
   def writePath(self, path):
     mat = self.map[:]
@@ -35,7 +35,7 @@ class Framework(object):
       x = item[0]
       y = item[1]
       if mat[y][x] == floor: mat[y][x] = pathc
-    writebmp('path.bmp', self.size, self.size, mat)
+    writebmp('path2.bmp', self.size, self.size, mat)
   
   def actions(self, s):
     a = {'l','r','u','d'}
@@ -74,9 +74,9 @@ class Framework(object):
     return len(ls)  
 
 
-im = Image('img/Test2.bmp')
+im = Image('img/Test.bmp')
 
-n = 20
+n = 13
 
 mat = []
 
@@ -124,7 +124,7 @@ for y in range(n):
     
 f1 = Framework(mat)
 f1.writeImage()
-def graph_search(problem):
+def breath_first(problem):
   frontier = [[problem.startpos]]
   explored = []
 
@@ -145,9 +145,33 @@ def graph_search(problem):
     else:
       return False
 
-npath = graph_search(f1)
+def depth_first(problem, node = None, visited=[]):
+  if node is None: node = problem.startpos
+  if not node in visited:
+    posible_paths = []
+    visited.append(node)
+    if problem.goalTest(node):
+      return [node]
+    for a in problem.actions(node):
+      result = problem.result(node, a)
+      path = depth_first(problem, result, visited[:])
+      if path: posible_paths.append(path)
+    if not posible_paths: return []
+    smallest = posible_paths[0]
+    for p in posible_paths:
+      if len(p) < len(smallest):
+        smallest = p
+    smallest.insert(0, node)
+    return smallest
+  else:
+    return []
 
+npath = depth_first(f1)
+print(npath)
 f1.writePath(npath)
+#npath = graph_search(f1)
+
+#f1.writePath(npath)
 
 #(2,12) 22
 #(16,19) 24
