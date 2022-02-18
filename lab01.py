@@ -1,3 +1,9 @@
+#Universidad del Valle de Guatemala
+#Sebastian Maldonado
+#Laurelinda Gomez
+#Laboratorio 1
+
+
 from lib import *
 
 wall = color(0, 0, 0)
@@ -20,15 +26,18 @@ class Framework(object):
           self.finishlist.append((x, y))
     self.currentpos = self.startpos
 
+#Impresion
   def printInfo(self):
     print(self.map)
     print(self.size)
     print(self.startpos)
     print(self.finishlist)
 
+#Escritura de la imagen
   def writeImage(self):
     writebmp('discrete.bmp', self.size, self.size, self.map)
   
+#Escritura del path
   def writePath(self, path):
     mat = self.map[:]
     for item in path:
@@ -36,7 +45,8 @@ class Framework(object):
       y = item[1]
       if mat[y][x] == floor: mat[y][x] = pathc
     writebmp('path.bmp', self.size, self.size, mat)
-  
+
+#Acciones  
   def actions(self, s):
     a = {'l','r','u','d'}
     x = s[0]
@@ -51,6 +61,7 @@ class Framework(object):
       a.remove('u')
     return a 
   
+#Resultado  
   def result(self, s, a):
     x = s[0]
     y = s[1]
@@ -160,6 +171,7 @@ def depth_first(problem, node = None, visited=[]):
   else:
     return []
 
+#La heuristica 1
 def heuristic1(problem, node):
   d = float('inf')
   for finish in problem.finishlist:
