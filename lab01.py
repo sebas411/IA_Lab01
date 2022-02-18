@@ -1,3 +1,9 @@
+#Universidad del Valle de Guatemala
+#Sebastian Maldonado
+#Laurelinda Gomez
+#Laboratorio 1
+
+
 from lib import *
 from algorithms import *
 from time import time as clock
@@ -16,10 +22,12 @@ class Framework(object):
         elif mat[y][x] == finish:
           self.finishlist.append((x, y))
     self.currentpos = self.startpos
-
+  
+  # Escritura de imagen discreta
   def writeImage(self):
     writebmp('discrete.bmp', self.size, self.size, self.map)
   
+  # Escritura de camino encontrado
   def writePath(self, path, name='path.bmp'):
     mat = self.map[:]
     for item in path:
@@ -28,6 +36,7 @@ class Framework(object):
       if mat[y][x] == floor: mat[y][x] = pathc
     writebmp(name, self.size, self.size, mat)
   
+  # Acciones disponibles
   def actions(self, s):
     a = {'l','r','u','d'}
     x = s[0]
@@ -42,6 +51,7 @@ class Framework(object):
       a.remove('u')
     return a 
   
+  #Resultado de una acción
   def result(self, s, a):
     x = s[0]
     y = s[1]
@@ -55,6 +65,7 @@ class Framework(object):
       sp = (x + 1, y)
     return sp
 
+  # Prueba de meta
   def goalTest(self, s):
     return s in self.finishlist
 
